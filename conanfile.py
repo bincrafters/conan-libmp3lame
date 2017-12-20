@@ -17,7 +17,7 @@ class LibnameConan(ConanFile):
     default_options = "shared=False"
 
     def source(self):
-        source_url = "http://downloads.sourceforge.net/project/lame/lame/%s/lame-%s.tar.gz" \
+        source_url = "https://downloads.sourceforge.net/project/lame/lame/%s/lame-%s.tar.gz" \
                      % (self.version, self.version)
         tools.get(source_url)
         extracted_dir = "lame-" + self.version
