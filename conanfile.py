@@ -35,6 +35,8 @@ class LibnameConan(ConanFile):
                 args.extend(['--disable-static', '-enable-shared'])
             else:
                 args.extend(['--disable-shared', '--enable-static'])
+            if self.settings.build_type == 'Debug':
+                args.append('--enable-debug')
 
             env_vars = {'ac_cv_header_xmmintrin_h': 'no'}
             with tools.environment_append(env_vars):
