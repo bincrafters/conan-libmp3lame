@@ -36,10 +36,12 @@ class LibnameConan(ConanFile):
             else:
                 args.extend(['--disable-shared', '--enable-static'])
 
-            env_build = AutoToolsBuildEnvironment(self)
-            env_build.configure(args=args)
-            env_build.make()
-            env_build.make(args=['install'])
+            env_vars = {'ac_cv_header_xmmintrin_h': 'no'}
+            with tools.environment_append(env_vars):
+                env_build = AutoToolsBuildEnvironment(self)
+                env_build.configure(args=args)
+                env_build.make()
+                env_build.make(args=['install'])
 
     def build(self):
         if self.settings.compiler == 'Visual Studio':
