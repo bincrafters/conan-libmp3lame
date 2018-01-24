@@ -3,6 +3,7 @@
 
 from conans import ConanFile, AutoToolsBuildEnvironment, tools
 import os
+import shutil
 
 
 class LibnameConan(ConanFile):
@@ -16,6 +17,9 @@ class LibnameConan(ConanFile):
     options = {"shared": [True, False]}
     default_options = "shared=False"
 
+    def build_requirements(self):
+        self.build_requires("nasm_installer/[>=2.13.02]@bincrafters/stable")
+
     def source(self):
         source_url = "https://downloads.sourceforge.net/project/lame/lame/%s/lame-%s.tar.gz" \
                      % (self.version, self.version)
@@ -26,7 +30,16 @@ class LibnameConan(ConanFile):
         tools.replace_in_file(os.path.join('sources', 'include', 'libmp3lame.sym'), 'lame_init_old\n', '')
 
     def build_vs(self):
-        raise Exception('TODO')
+        with tools.chdir('sources'):
+            shutil.copy('configMS.h', 'config.h')
+            command = 'nmake -f Makefile.MSVC comp=msvc asm=yes'
+            if self.settings.arch == 'x86_64':
+                tools.replace_in_file('Makefile.MSVC', 'MACHINE = /machine:I386', 'MACHINE =/machine:X64')
+                command += ' MSVCVER=Win64'
+            if self.options.shared:
+                command += ' dll'
+            with tools.vcvars(self.settings, filter_known_paths=False, force=True):
+                self.run(command)
 
     def build_configure(self):
         with tools.chdir('sources'):
@@ -53,6 +66,18 @@ class LibnameConan(ConanFile):
 
     def package(self):
         self.copy(pattern="LICENSE", src='sources')
+        if self.settings.compiler == 'Visual Studio':
+            self.copy(pattern='*.h', src=os.path.join('sources', 'include'), dst=os.path.join('include', 'lame'))
+            self.copy(pattern='*.lib', src=os.path.join('sources', 'output'), dst='lib')
+            self.copy(pattern='*.exe', src=os.path.join('sources', 'output'), dst='bin')
+            if self.options.shared:
+                self.copy(pattern='*.dll', src=os.path.join('sources', 'output'), dst='bin')
 
     def package_info(self):
-        self.cpp_info.libs = ['mp3lame']
+        if self.settings.compiler == 'Visual Studio':
+            if self.options.shared:
+                self.cpp_info.libs = ['libmp3lame']
+            else:
+                self.cpp_info.libs = ['libmp3lame-static']
+        else:
+            self.cpp_info.libs = ['mp3lame']
