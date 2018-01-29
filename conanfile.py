@@ -17,6 +17,10 @@ class LibnameConan(ConanFile):
     options = {"shared": [True, False]}
     default_options = "shared=False"
 
+    @property
+    def is_mingw(self):
+        return self.settings.compiler == 'gcc' and self.settings.os == 'Windows'
+
     def build_requirements(self):
         self.build_requires("nasm_installer/[>=2.13.02]@bincrafters/stable")
 
@@ -43,7 +47,10 @@ class LibnameConan(ConanFile):
 
     def build_configure(self):
         with tools.chdir('sources'):
-            args = ['--prefix=%s' % self.package_folder]
+            prefix = os.path.abspath(self.package_folder)
+            if self.is_mingw:
+                prefix = tools.unix_path(prefix, tools.MSYS2)
+            args = ['--prefix=%s' % prefix]
             if self.options.shared:
                 args.extend(['--disable-static', '-enable-shared'])
             else:
@@ -53,7 +60,7 @@ class LibnameConan(ConanFile):
 
             env_vars = {'ac_cv_header_xmmintrin_h': 'no'}
             with tools.environment_append(env_vars):
-                env_build = AutoToolsBuildEnvironment(self)
+                env_build = AutoToolsBuildEnvironment(self, win_bash=self.is_mingw)
                 env_build.configure(args=args)
                 env_build.make()
                 env_build.make(args=['install'])
@@ -61,6 +68,11 @@ class LibnameConan(ConanFile):
     def build(self):
         if self.settings.compiler == 'Visual Studio':
             self.build_vs()
+        elif self.is_mingw:
+            msys_bin = self.deps_env_info['msys2_installer'].MSYS_BIN
+            with tools.environment_append({'PATH': [msys_bin],
+                                           'CONAN_BASH_PATH': os.path.join(msys_bin, 'bash.exe')}):
+                self.build_configure()
         else:
             self.build_configure()
 
