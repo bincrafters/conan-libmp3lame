@@ -75,9 +75,6 @@ class LibnameConan(ConanFile):
 
     def package_info(self):
         if self.settings.compiler == 'Visual Studio':
-            if self.options.shared:
-                self.cpp_info.libs = ['libmp3lame']
-            else:
-                self.cpp_info.libs = ['libmp3lame-static']
+            self.cpp_info.libs = ['libmp3lame' if self.options.shared else 'libmp3lame-static']
         else:
             self.cpp_info.libs = ['mp3lame']
