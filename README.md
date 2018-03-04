@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.org/bincrafters/conan-libmp3lame.svg?branch=testing%2F3.100)](https://travis-ci.org/bincrafters/conan-libmp3lame)
 [![Build status](https://ci.appveyor.com/api/projects/status/github/bincrafters/conan-libmp3lame?branch=testing%2F3.100&svg=true)](https://ci.appveyor.com/project/bincrafters/conan-libmp3lame)
 
-[Conan.io](https://conan.io) package recipe for *libmp3lame*.
+[Conan.io](https://conan.io) package recipe for [*libmp3lame*](http://lame.sourceforge.net/).
 
 LAME is a high quality MPEG Audio Layer III (MP3) encoder licensed under the LGPL.
 
@@ -42,6 +42,7 @@ The following command both runs all the steps of the conan file, and publishes t
 ### Available Options
 | Option        | Default | Possible Values  |
 | ------------- |:----------------- |:------------:|
+| fPIC      | True |  [True, False] |
 | shared      | False |  [True, False] |
 
 ## Add Remote
@@ -58,4 +59,4 @@ The following command both runs all the steps of the conan file, and publishes t
 NOTE: The conan recipe license applies only to the files of this recipe, which can be used to build and package libmp3lame.
 It does *not* in any way apply or is related to the actual software being packaged.
 
-[MIT](https://github.com/bincrafters/conan-libmp3lame.git/blob/testing/3.100/LICENSE.md)
+[MIT](https://github.com/bincrafters/conan-libmp3lame.git/blob/testing/3.100/LICENSE)
