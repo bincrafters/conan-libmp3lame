@@ -6,7 +6,7 @@ import os
 import shutil
 
 
-class LibnameConan(ConanFile):
+class LibMP3LameConan(ConanFile):
     name = "libmp3lame"
     version = "3.100"
     url = "https://github.com/bincrafters/conan-libname"
