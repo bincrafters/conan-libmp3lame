@@ -11,6 +11,7 @@ class LibnameConan(ConanFile):
     version = "3.100"
     url = "https://github.com/bincrafters/conan-libname"
     description = "LAME is a high quality MPEG Audio Layer III (MP3) encoder licensed under the LGPL."
+    homepage = "http://lame.sourceforge.net/"
     license = "http://lame.sourceforge.net/license.txt"
     exports_sources = ["LICENSE"]
     settings = "os", "arch", "compiler", "build_type"
