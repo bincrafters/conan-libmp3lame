@@ -63,6 +63,8 @@ class LibMP3LameConan(ConanFile):
                 args.append('--with-pic')
 
             env_build = AutoToolsBuildEnvironment(self, win_bash=self.is_mingw)
+            if self.settings.compiler == 'clang':
+                env_build.flags.extend(['-mmmx', '-msse'])
             env_build.configure(args=args)
             env_build.make()
             env_build.make(args=['install'])
