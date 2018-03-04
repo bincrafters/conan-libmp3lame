@@ -56,12 +56,10 @@ class LibMP3LameConan(ConanFile):
             if self.settings.build_type == 'Debug':
                 args.append('--enable-debug')
 
-            env_vars = {'ac_cv_header_xmmintrin_h': 'no'}
-            with tools.environment_append(env_vars):
-                env_build = AutoToolsBuildEnvironment(self, win_bash=self.is_mingw)
-                env_build.configure(args=args)
-                env_build.make()
-                env_build.make(args=['install'])
+            env_build = AutoToolsBuildEnvironment(self, win_bash=self.is_mingw)
+            env_build.configure(args=args)
+            env_build.make()
+            env_build.make(args=['install'])
 
     def build(self):
         if self.settings.compiler == 'Visual Studio':
