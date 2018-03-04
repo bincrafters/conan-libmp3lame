@@ -79,7 +79,7 @@ class LibMP3LameConan(ConanFile):
             self.build_configure()
 
     def package(self):
-        self.copy(pattern="LICENSE", src='sources')
+        self.copy(pattern="LICENSE", src='sources', dst="licenses")
         if self.settings.compiler == 'Visual Studio':
             self.copy(pattern='*.h', src=os.path.join('sources', 'include'), dst=os.path.join('include', 'lame'))
             self.copy(pattern='*.lib', src=os.path.join('sources', 'output'), dst='lib')
