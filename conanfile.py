@@ -22,9 +22,6 @@ class LibMP3LameConan(ConanFile):
     def is_mingw(self):
         return self.settings.compiler == 'gcc' and self.settings.os == 'Windows'
 
-    def build_requirements(self):
-        self.build_requires("nasm_installer/[>=2.13.02]@bincrafters/stable")
-
     def source(self):
         source_url = "https://downloads.sourceforge.net/project/lame/lame/%s/lame-%s.tar.gz" \
                      % (self.version, self.version)

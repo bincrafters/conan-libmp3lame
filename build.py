@@ -8,14 +8,13 @@ import os
 
 
 def add_build_requires(builds):
-    if os.getenv('MINGW_CONFIGURATIONS', ''):
-        return map(add_required_installers, builds)
-    else:
-        return builds
+    return map(add_required_installers, builds)
 
 
 def add_required_installers(build):
-    installers = ['mingw_installer/1.0@conan/stable', 'msys2_installer/latest@bincrafters/stable']
+    installers = ['nasm_installer/2.13.02@bincrafters/stable']
+    if os.getenv('MINGW_CONFIGURATIONS', ''):
+        installers.extend(['mingw_installer/1.0@conan/stable', 'msys2_installer/latest@bincrafters/stable'])
     build.build_requires.update({"*": installers})
     return build
 
