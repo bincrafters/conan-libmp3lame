@@ -15,12 +15,16 @@ class LibMP3LameConan(ConanFile):
     license = "LGPL"
     exports_sources = ["LICENSE"]
     settings = "os", "arch", "compiler", "build_type"
-    options = {"shared": [True, False]}
-    default_options = "shared=False"
+    options = {"shared": [True, False], "fPIC": [True, False]}
+    default_options = "shared=False", "fPIC=True"
 
     @property
     def is_mingw(self):
         return self.settings.compiler == 'gcc' and self.settings.os == 'Windows'
+
+    def config_options(self):
+        if self.settings.os == 'Windows':
+            del self.options.fPIC
 
     def source(self):
         source_url = "https://downloads.sourceforge.net/project/lame/lame/%s/lame-%s.tar.gz" \
@@ -55,6 +59,8 @@ class LibMP3LameConan(ConanFile):
                 args.extend(['--disable-shared', '--enable-static'])
             if self.settings.build_type == 'Debug':
                 args.append('--enable-debug')
+            if self.settings.os != 'Windows' and self.options.fPIC:
+                args.append('--with-pic')
 
             env_build = AutoToolsBuildEnvironment(self, win_bash=self.is_mingw)
             env_build.configure(args=args)
