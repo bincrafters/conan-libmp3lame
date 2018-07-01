@@ -88,9 +88,9 @@ class LibMP3LameConan(ConanFile):
             self.copy(pattern='*.exe', src=os.path.join('sources', 'output'), dst='bin')
             if self.options.shared:
                 self.copy(pattern='*.dll', src=os.path.join('sources', 'output'), dst='bin')
+            name = 'libmp3lame.lib' if self.options.shared else 'libmp3lame-static.lib'
+            shutil.move(os.path.join(self.package_folder, 'lib', name),
+                        os.path.join(self.package_folder, 'lib', 'mp3lame.lib'))
 
     def package_info(self):
-        if self.settings.compiler == 'Visual Studio':
-            self.cpp_info.libs = ['libmp3lame' if self.options.shared else 'libmp3lame-static']
-        else:
-            self.cpp_info.libs = ['mp3lame']
+        self.cpp_info.libs = ['mp3lame']
