@@ -13,14 +13,18 @@ class LibMP3LameConan(ConanFile):
     description = "LAME is a high quality MPEG Audio Layer III (MP3) encoder licensed under the LGPL."
     homepage = "http://lame.sourceforge.net/"
     license = "LGPL"
-    exports_sources = ["LICENSE"]
+    exports_sources = ["LICENSE", "6410.patch", "6416.patch"]
     settings = "os", "arch", "compiler", "build_type"
     options = {"shared": [True, False], "fPIC": [True, False]}
-    default_options = "shared=False", "fPIC=True"
+    default_options = {"shared": False, "fPIC": True}
 
     @property
-    def is_mingw(self):
-        return self.settings.compiler == 'gcc' and self.settings.os == 'Windows'
+    def is_mingw_windows(self):
+        return self.settings.compiler == 'gcc' and self.settings.os == 'Windows' and os.name == 'nt'
+
+    @property
+    def is_msvc(self):
+        return self.settings.compiler == 'Visual Studio'
 
     def config_options(self):
         if self.settings.os == 'Windows':
@@ -35,7 +39,10 @@ class LibMP3LameConan(ConanFile):
 
         tools.replace_in_file(os.path.join('sources', 'include', 'libmp3lame.sym'), 'lame_init_old\n', '')
 
-    def build_vs(self):
+        for patch in [6410, 6416]:
+            tools.patch(base_path='sources', patch_file='%s.patch' % patch, strip=3)
+
+    def _build_vs(self):
         with tools.chdir('sources'):
             shutil.copy('configMS.h', 'config.h')
             command = 'nmake -f Makefile.MSVC comp=msvc asm=yes'
@@ -47,12 +54,9 @@ class LibMP3LameConan(ConanFile):
             with tools.vcvars(self.settings, filter_known_paths=False, force=True):
                 self.run(command)
 
-    def build_configure(self):
+    def _build_configure(self):
         with tools.chdir('sources'):
-            prefix = os.path.abspath(self.package_folder)
-            if self.is_mingw:
-                prefix = tools.unix_path(prefix, tools.MSYS2)
-            args = ['--prefix=%s' % prefix]
+            args = []
             if self.options.shared:
                 args.extend(['--disable-static', '-enable-shared'])
             else:
@@ -62,7 +66,7 @@ class LibMP3LameConan(ConanFile):
             if self.settings.os != 'Windows' and self.options.fPIC:
                 args.append('--with-pic')
 
-            env_build = AutoToolsBuildEnvironment(self, win_bash=self.is_mingw)
+            env_build = AutoToolsBuildEnvironment(self, win_bash=self.is_mingw_windows)
             if self.settings.compiler == 'clang':
                 env_build.flags.extend(['-mmmx', '-msse'])
             env_build.configure(args=args)
@@ -70,19 +74,14 @@ class LibMP3LameConan(ConanFile):
             env_build.make(args=['install'])
 
     def build(self):
-        if self.settings.compiler == 'Visual Studio':
-            self.build_vs()
-        elif self.is_mingw:
-            msys_bin = self.deps_env_info['msys2_installer'].MSYS_BIN
-            with tools.environment_append({'PATH': [msys_bin],
-                                           'CONAN_BASH_PATH': os.path.join(msys_bin, 'bash.exe')}):
-                self.build_configure()
+        if self.is_msvc:
+            self._build_vs()
         else:
-            self.build_configure()
+            self._build_configure()
 
     def package(self):
         self.copy(pattern="LICENSE", src='sources', dst="licenses")
-        if self.settings.compiler == 'Visual Studio':
+        if self.is_msvc:
             self.copy(pattern='*.h', src=os.path.join('sources', 'include'), dst=os.path.join('include', 'lame'))
             self.copy(pattern='*.lib', src=os.path.join('sources', 'output'), dst='lib')
             self.copy(pattern='*.exe', src=os.path.join('sources', 'output'), dst='bin')
