@@ -13,7 +13,7 @@ class LibMP3LameConan(ConanFile):
     description = "LAME is a high quality MPEG Audio Layer III (MP3) encoder licensed under the LGPL."
     homepage = "http://lame.sourceforge.net/"
     license = "LGPL"
-    exports_sources = ["LICENSE", "6410.patch", "6416.patch"]
+    exports_sources = ["LICENSE", "6410.patch", "6416.patch", "android.patch"]
     settings = "os", "arch", "compiler", "build_type"
     options = {"shared": [True, False], "fPIC": [True, False]}
     default_options = {"shared": False, "fPIC": True}
@@ -41,6 +41,8 @@ class LibMP3LameConan(ConanFile):
 
         for patch in [6410, 6416]:
             tools.patch(base_path='sources', patch_file='%s.patch' % patch, strip=3)
+
+        tools.patch(base_path='sources', patch_file='android.patch')
 
     def _build_vs(self):
         with tools.chdir('sources'):
