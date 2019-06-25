@@ -12,7 +12,9 @@ class LibMP3LameConan(ConanFile):
     url = "https://github.com/bincrafters/conan-libname"
     description = "LAME is a high quality MPEG Audio Layer III (MP3) encoder licensed under the LGPL."
     homepage = "http://lame.sourceforge.net/"
-    license = "LGPL"
+    author = "Bincrafters <bincrafters@gmail.com>"
+    topics = "multimedia", "audio", "libmp3lame", "mp3", "decoder", "encoding", "decoding"
+    license = "LGPL-2.0"
     exports_sources = ["LICENSE", "6410.patch", "6416.patch", "android.patch"]
     settings = "os", "arch", "compiler", "build_type"
     options = {"shared": [True, False], "fPIC": [True, False]}
@@ -33,7 +35,7 @@ class LibMP3LameConan(ConanFile):
     def source(self):
         source_url = "https://downloads.sourceforge.net/project/lame/lame/%s/lame-%s.tar.gz" \
                      % (self.version, self.version)
-        tools.get(source_url)
+        tools.get(source_url,sha256="bla")
         extracted_dir = "lame-" + self.version
         os.rename(extracted_dir, "sources")
 
