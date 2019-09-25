@@ -9,7 +9,7 @@ import shutil
 class LibMP3LameConan(ConanFile):
     name = "libmp3lame"
     version = "3.100"
-    url = "https://github.com/bincrafters/conan-libname"
+    url = "https://github.com/bincrafters/conan-libmp3lame"
     description = "LAME is a high quality MPEG Audio Layer III (MP3) encoder licensed under the LGPL."
     homepage = "http://lame.sourceforge.net/"
     author = "Bincrafters <bincrafters@gmail.com>"
@@ -21,8 +21,8 @@ class LibMP3LameConan(ConanFile):
     default_options = {"shared": False, "fPIC": True}
 
     @property
-    def is_mingw_windows(self):
-        return self.settings.compiler == 'gcc' and self.settings.os == 'Windows' and os.name == 'nt'
+    def _use_winbash(self):
+        return tools.os_info.is_windows and (self.settings.compiler == "gcc" or tools.cross_building(self.settings))
 
     @property
     def is_msvc(self):
@@ -70,8 +70,8 @@ class LibMP3LameConan(ConanFile):
             if self.settings.os != 'Windows' and self.options.fPIC:
                 args.append('--with-pic')
 
-            env_build = AutoToolsBuildEnvironment(self, win_bash=self.is_mingw_windows)
-            if self.settings.compiler == 'clang':
+            env_build = AutoToolsBuildEnvironment(self, win_bash=self._use_winbash)
+            if self.settings.compiler == 'clang' and self.settings.arch in ['x86', 'x86_64']:
                 env_build.flags.extend(['-mmmx', '-msse'])
             env_build.configure(args=args)
             env_build.make()
