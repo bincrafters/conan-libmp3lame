@@ -9,7 +9,6 @@ class LibMP3LameConan(ConanFile):
     url = "https://github.com/bincrafters/conan-libmp3lame"
     description = "LAME is a high quality MPEG Audio Layer III (MP3) encoder licensed under the LGPL."
     homepage = "http://lame.sourceforge.net/"
-    author = "Bincrafters <bincrafters@gmail.com>"
     topics = ("conan", "libmp3lame", "multimedia", "audio", "mp3", "decoder", "encoding", "decoding")
     license = "LGPL-2.0"
     exports_sources = ["LICENSE", "6410.patch", "6416.patch", "android.patch"]
