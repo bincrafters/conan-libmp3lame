@@ -28,6 +28,11 @@ class LibMP3LameConan(ConanFile):
         if self.settings.os == 'Windows':
             del self.options.fPIC
 
+    def build_requirements(self):
+        if self._use_winbash and not self.is_msvc:
+            if "CONAN_BASH_PATH" not in os.environ:
+                self.build_requires("msys2/20190524")
+
     def source(self):
         source_url = "https://downloads.sourceforge.net/project/lame/lame/%s/lame-%s.tar.gz" \
                      % (self.version, self.version)
